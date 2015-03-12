@@ -18,6 +18,8 @@
 package org.holylobster.nuntius;
 
 import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -81,8 +83,12 @@ public final class Server extends BroadcastReceiver implements SharedPreferences
     }
 
     private void sendMessage(String event, StatusBarNotification sbn) {
+        Message message = new Message(event, sbn);
+        String json = message.toJSON(context);
+        Log.d(TAG, "Notification:\n=====\n" + json + "\n=====");
+
         for (Connection connection : connections) {
-            boolean queued = connection.enqueue(new Message(event, sbn));
+            boolean queued = connection.enqueue(message);
             if (!queued) {
                 Log.w(TAG, "Unable to enqueue message on connection " + connection);
             }
@@ -231,5 +237,19 @@ public final class Server extends BroadcastReceiver implements SharedPreferences
         }
 
     }
+/*
+    private void onCancel(String id) {
+        NotificationManager notificationMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationMgr.cancel(id);
 
+        final Intent intent = new Intent();
+        intent.putExtra(remoteInput.getResultKey(), "Skynet begins to learn at a geometric rate. It becomes self-aware at 2:14 a.m. Eastern time, August 29th. In a panic, they try to pull the plug.");
+        try {
+            action.actionIntent.send(NotificationListenerService.this, 0, intent);
+        } catch (PendingIntent.CanceledException e) {
+            e.printStackTrace();
+        }
+
+    }
+*/
 }
