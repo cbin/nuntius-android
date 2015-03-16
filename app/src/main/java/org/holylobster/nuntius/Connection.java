@@ -23,9 +23,11 @@ import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -36,13 +38,13 @@ public class Connection extends Thread {
     private final BlockingQueue<Message> queue = new LinkedBlockingDeque<>();
     private final Context context;
 
-    private BluetoothSocket socket;
+    private NuntiusSocket socket;
     private BufferedOutputStream outputStream;
     private BufferedInputStream inputStream;
 
     private final Thread senderThread;
 
-    Connection(Context context, BluetoothSocket socket) {
+    Connection(Context context, NuntiusSocket socket) {
         this.socket = socket;
         this.context = context;
 
@@ -140,6 +142,67 @@ public class Connection extends Thread {
             }
         }
         queue.clear();
+    }
+
+    public interface NuntiusSocket extends Closeable {
+        InputStream getInputStream() throws IOException;
+        OutputStream getOutputStream() throws IOException;
+
+        boolean isConnected();
+    }
+
+    public class BluetoothSocketAdapter implements NuntiusSocket {
+        private final BluetoothSocket socket;
+        BluetoothSocketAdapter(BluetoothSocket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return socket.getInputStream();
+        }
+
+        @Override
+        public OutputStream getOutputStream() throws IOException {
+            return socket.getOutputStream();
+        }
+
+        @Override
+        public boolean isConnected() {
+            return socket.isConnected();
+        }
+
+        @Override
+        public void close() throws IOException {
+            socket.close();
+        }
+    }
+
+    public class NetworkSocketAdapter implements NuntiusSocket {
+        private final Socket socket;
+        NetworkSocketAdapter(Socket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return socket.getInputStream();
+        }
+
+        @Override
+        public OutputStream getOutputStream() throws IOException {
+            return socket.getOutputStream();
+        }
+
+        @Override
+        public boolean isConnected() {
+            return socket.isConnected();
+        }
+
+        @Override
+        public void close() throws IOException {
+            socket.close();
+        }
     }
 
 
