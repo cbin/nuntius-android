@@ -31,6 +31,8 @@ import android.preference.PreferenceGroup;
 import android.support.v7.app.ActionBarActivity;
 import android.widget.Toast;
 
+import org.holylobster.nuntius.communication.BluetoothServer;
+
 public class SettingsActivity extends ActionBarActivity {
 
     private static final String TAG = SettingsActivity.class.getSimpleName();
@@ -119,10 +121,10 @@ public class SettingsActivity extends ActionBarActivity {
             updatePreference(preference);
             if (preference.getKey().equals("main_enable_switch")) {
                 if (preference.getSharedPreferences().getBoolean("main_enable_switch", true)) {
-                    if (!Server.bluetoothAvailable()) {
+                    if (!BluetoothServer.bluetoothAvailable()) {
                         Toast.makeText(getActivity(), getString(R.string.bluetooth_not_available), Toast.LENGTH_LONG).show();
                     }
-                    else if (!Server.bluetoothEnabled()) {
+                    else if (!BluetoothServer.bluetoothEnabled()) {
                         if (!requestEnableBluetooth()) {
                             Toast.makeText(getActivity(), getString(R.string.bluetooth_not_enabled), Toast.LENGTH_LONG).show();
                             return;

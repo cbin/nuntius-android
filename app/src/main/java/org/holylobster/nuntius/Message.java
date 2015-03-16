@@ -47,7 +47,7 @@ public class Message {
         this.event = event;
     }
 
-    String toJSON(Context context) {
+    public String toJSON(Context context) {
         StringWriter out = new StringWriter();
         JsonWriter writer = new JsonWriter(out);
 

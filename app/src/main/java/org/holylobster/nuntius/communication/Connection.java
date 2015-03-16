@@ -15,15 +15,17 @@
  * along with Nuntius. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.holylobster.nuntius;
+package org.holylobster.nuntius.communication;
 
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.util.Log;
 
+import org.holylobster.nuntius.Message;
+import org.holylobster.nuntius.communication.NuntiusSocket;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -82,7 +84,7 @@ public class Connection extends Thread {
             return;
         }
 
-        Log.i(TAG, "Sending message over Bluetooth");
+        Log.i(TAG, "Sending message to " + socket.getDestination());
         try {
             outputStream.write(m.toJSON(context).getBytes());
             outputStream.write('\r');
@@ -142,67 +144,6 @@ public class Connection extends Thread {
             }
         }
         queue.clear();
-    }
-
-    public interface NuntiusSocket extends Closeable {
-        InputStream getInputStream() throws IOException;
-        OutputStream getOutputStream() throws IOException;
-
-        boolean isConnected();
-    }
-
-    public class BluetoothSocketAdapter implements NuntiusSocket {
-        private final BluetoothSocket socket;
-        BluetoothSocketAdapter(BluetoothSocket socket) {
-            this.socket = socket;
-        }
-
-        @Override
-        public InputStream getInputStream() throws IOException {
-            return socket.getInputStream();
-        }
-
-        @Override
-        public OutputStream getOutputStream() throws IOException {
-            return socket.getOutputStream();
-        }
-
-        @Override
-        public boolean isConnected() {
-            return socket.isConnected();
-        }
-
-        @Override
-        public void close() throws IOException {
-            socket.close();
-        }
-    }
-
-    public class NetworkSocketAdapter implements NuntiusSocket {
-        private final Socket socket;
-        NetworkSocketAdapter(Socket socket) {
-            this.socket = socket;
-        }
-
-        @Override
-        public InputStream getInputStream() throws IOException {
-            return socket.getInputStream();
-        }
-
-        @Override
-        public OutputStream getOutputStream() throws IOException {
-            return socket.getOutputStream();
-        }
-
-        @Override
-        public boolean isConnected() {
-            return socket.isConnected();
-        }
-
-        @Override
-        public void close() throws IOException {
-            socket.close();
-        }
     }
 
 

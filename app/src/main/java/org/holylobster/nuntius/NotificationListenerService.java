@@ -22,6 +22,9 @@ import android.os.IBinder;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
+import org.holylobster.nuntius.communication.CompositeServer;
+import org.holylobster.nuntius.communication.Server;
+
 public class NotificationListenerService extends android.service.notification.NotificationListenerService {
 
     private final String TAG = this.getClass().getSimpleName();
@@ -35,7 +38,7 @@ public class NotificationListenerService extends android.service.notification.No
         IBinder mIBinder = super.onBind(mIntent);
         Log.i(TAG, "onBind");
         isNotificationAccessEnabled = true;
-        server = new Server(this);
+        server = new CompositeServer(this);
         server.start();
         return mIBinder;
     }
